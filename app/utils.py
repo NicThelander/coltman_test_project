@@ -1,4 +1,6 @@
 from jose import jwt
+from jose.exceptions import JOSEError
+from fastapi import HTTPException
 from datetime import datetime, timedelta
 from auth_vars import jwt_secret
 import bcrypt
@@ -20,3 +22,15 @@ def create_token(token_payload):
     return jwt.encode(token_payload,
     key=jwt_secret,
     algorithm="HS256")
+
+def decrypt_token(token):
+    return jwt.decode(token, jwt_secret, algorithms=['HS256'])
+
+def check_auth_token(credentials):
+    try:
+        jwt_dict = decrypt_token(credentials.credentials)
+        return jwt_dict["exp"]
+    except JOSEError as e:
+        raise HTTPException(
+            status_code=401,
+            detail=str(e))

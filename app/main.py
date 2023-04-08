@@ -1,8 +1,16 @@
-from fastapi import FastAPI, status, HTTPException
-from .utils import create_token, register_user, auth_user
+from fastapi import FastAPI, status, HTTPException, Header, Depends
+from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
+from typing import Annotated
+from .utils import (create_token,
+                    register_user,
+                    auth_user,
+                    decrypt_token,
+                    check_auth_token)
 from .models import Registration, Login, PriceFeeds
 from .database import db2_conn, db1_users
+from datetime import datetime
 
+security = HTTPBearer()
 
 app = FastAPI()
 
@@ -53,11 +61,21 @@ async def login(login: Login):
         if auth_user(login_dict, user_details):
             return {"access_token": create_token({"email": user_details["email"]}),
             "token_type": "bearer"}
-
-        raise HTTPException(
-                status_code=status.HTTP_401_UNAUTHORIZED,
-                detail="Incorrect password")
+        else:
+            raise HTTPException(
+                    status_code=status.HTTP_401_UNAUTHORIZED,
+                    detail="Incorrect password")
     else:
         raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
                 detail="No user with this email was found")
+
+@app.get("/get_all_users/")
+async def get_all_users(credentials: HTTPAuthorizationCredentials= Depends(security)):
+    return check_auth_token(credentials)
+    
+
+    # if datetime.utcnow() <= jwt_dict["exp"]:
+    #     return "in the Nic of time"
+    # else:
+    #     return "not in the Nic of time"
