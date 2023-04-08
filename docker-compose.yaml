@@ -1,20 +1,52 @@
+version: '3.8'
 services:
-  DB1:
+  db1:
     image: mongo:6
+    container_name: mongo
     restart: always
     ports:
       - '27017:27017'
     env_file:
       - db1.env
-  DB2:
+    volumes:
+      - ./db1:/data/db:rw
+  db2:
     image: postgres:15
     restart: always
+    container_name: postgres
+    user: postgres
     env_file:
       - db2.env
     ports:
       - '5438:5432'
     volumes:
       - ./01.sql:/docker-entrypoint-initdb.d/01.sql
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+ 
+  api:
+    restart: on-failure
+    container_name: api
+    build:
+        context: .
+        dockerfile: ./Dockerfile_api
+    image: python:3.10
+    tty: true # attaches the python script to a tty instance
+    stdin_open: true
+    ports:
+      - '8000:8000'
+    volumes:
+      - .:/code
+    depends_on:
+      - db1
+      - db2
+volumes:
+  pgdata:
 
+    
     
     
