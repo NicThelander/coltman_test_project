@@ -1,0 +1,15 @@
+{
+  "name": "api-caller",
+  "version": "1.0.0",
+  "description": "various API helper functionalities that operate between coinlayer api and python one",
+  "main": "node_api_caller/fetch_price_feeds.js",
+  "author": "Nic",
+  "scripts": {
+    "fetch_price_feeds": "node node_api_caller/fetch_price_feeds.js"
+  },
+  "dependencies": {
+    "node-fetch": "3.3.1",
+    "dotenv": "16.0.3"
+  },
+  "type": "module"
+}

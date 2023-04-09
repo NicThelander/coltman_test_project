@@ -1,0 +1,11 @@
+FROM node:19.8.1
+
+WORKDIR /code
+
+COPY ./node_api_caller ./node_api_caller
+
+COPY package*.json ./
+
+RUN npm install
+
+CMD ["node", "./node_api_caller/fetch_price_feeds.js"]

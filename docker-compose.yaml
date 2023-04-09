@@ -9,7 +9,13 @@ services:
     env_file:
       - db1.env
     volumes:
-      - ./db1:/data/db:rw
+      - mongodata:/data/db:rw
+    healthcheck:
+      test: echo 'db.runCommand("ping").ok' | mongosh localhost:27017/productiondb --quiet
+      interval: 10s
+      timeout: 2s
+      retries: 5
+      
   db2:
     image: postgres:15
     restart: always
@@ -35,17 +41,38 @@ services:
         context: .
         dockerfile: ./Dockerfile_api
     image: python:3.10
-    tty: true # attaches the python script to a tty instance
-    stdin_open: true
     ports:
       - '8000:8000'
     volumes:
       - .:/code
     depends_on:
-      - db1
-      - db2
+      db1:
+        condition: service_healthy
+      db2:
+        condition: service_healthy
+    # for console info
+    tty: true
+    stdin_open: true
+
+  api-caller:
+    # restart: on-failure
+    container_name: api-caller
+    image: node:19.8.1
+    env_file:
+      - node_auth.env
+    build:
+        context: .
+        dockerfile: ./Dockerfile_api_caller
+    depends_on:
+      - api # need to wait longer for everything to be up
+    # for console info
+    tty: true
+    stdin_open: true
+
 volumes:
+  # this will store the db data in /var/lib/docker/volumes, pretty neat
   pgdata:
+  mongodata:
 
     
     

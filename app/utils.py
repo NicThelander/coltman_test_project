@@ -4,7 +4,7 @@ from fastapi import HTTPException
 from datetime import datetime, timedelta
 from auth_vars import jwt_secret
 import bcrypt
-from .database import db1_users
+from .database_utils import db1_users
 
 def register_user(reg_dict):
     # using bcrypt gensalt but could swap to kdf if the "pepper" style is preferred
@@ -24,12 +24,12 @@ def create_token(token_payload):
     algorithm="HS256")
 
 def decrypt_token(token):
-    return jwt.decode(token, jwt_secret, algorithms=['HS256'])
+    return jwt.decode(token, jwt_secret, algorithms=['HS256']) # returning for now to see if I'll need later but just using the credential check for validity
 
-def check_auth_token(credentials):
+def auth_token_validity(credentials):
     try:
-        jwt_dict = decrypt_token(credentials.credentials)
-        return jwt_dict["exp"]
+        decrypt_token(credentials.credentials)
+        return True
     except JOSEError as e:
         raise HTTPException(
             status_code=401,

@@ -5,6 +5,7 @@ CREATE TABLE IF NOT EXISTS price_feed_checks (
     -- doing one check every 5 mins will take around 20.4k years and I don't
     -- think this test project is that ambitious.
     target VARCHAR,
+    token VARCHAR, -- needed to add this in for the different coin types
     time_stamp TIMESTAMP, -- timestamp is a keyword so rather using time_stamp
     price FLOAT
 );
