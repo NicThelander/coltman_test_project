@@ -59,7 +59,7 @@ def update_prices(old_prices):
 
 def insert_price_feed(pd):
     # pd is price_feed_dictionary, just shortened for readability
-    # try:
+    try:
         db1_price_feeds.insert_one(pd)
         cur = db2_conn.cursor()
 
@@ -90,11 +90,11 @@ def insert_price_feed(pd):
                               , False
                               , "failed to get info from api"
                               )
-    # except:
-    #     return submit_logs( "submit coin info to db"
-    #                       , False
-    #                       , "failed submitting to database"
-    #                       )
+    except:
+        return submit_logs( "submit coin info to db"
+                          , False
+                          , "failed submitting to database"
+                          )
         
 
 def retrieve_price_feed(timestamp):
