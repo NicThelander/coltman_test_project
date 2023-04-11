@@ -10,6 +10,10 @@ services:
       - db1.env
     volumes:
       - mongodata:/data/db:rw
+    # below command is just to stop mongo flooding the terminal with it's logs 
+    command:
+      - '--logpath'
+      - '/var/log/mongodb/mongod.log'
     healthcheck:
       test: echo 'db.runCommand("ping").ok' | mongosh localhost:27017/productiondb --quiet
       interval: 10s
@@ -37,6 +41,10 @@ services:
   api:
     restart: on-failure
     container_name: api
+    env_file:
+      - db2.env
+      - db1.env
+      - jwt.env
     build:
         context: .
         dockerfile: ./Dockerfile_api
@@ -50,6 +58,11 @@ services:
         condition: service_healthy
       db2:
         condition: service_healthy
+    healthcheck:
+      test: curl --fail http://localhost:8000/health || exit 1
+      interval: 10s
+      timeout: 2s
+      retries: 5
     # for console info
     tty: true
     stdin_open: true
@@ -57,14 +70,16 @@ services:
   api-caller:
     # restart: on-failure
     container_name: api-caller
-    image: node:19.8.1
+    image: alpine:3.17.3
     env_file:
       - node_auth.env
+      - db2.env
     build:
         context: .
         dockerfile: ./Dockerfile_api_caller
     depends_on:
-      - api # need to wait longer for everything to be up
+      api:
+        condition: service_healthy
     # for console info
     tty: true
     stdin_open: true

@@ -11,9 +11,10 @@ CREATE TABLE IF NOT EXISTS price_feed_checks (
 );
 
 CREATE TABLE IF NOT EXISTS price_changes (
-    id VARCHAR PRIMARY KEY,
+    id SERIAL PRIMARY KEY,
     previous_price_record INT REFERENCES price_feed_checks (id),
     latest_price_record INT REFERENCES price_feed_checks (id),
+    token VARCHAR UNIQUE,
     price_change FLOAT
 );
 

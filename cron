@@ -1,0 +1,2 @@
+*/5 * * * * node /code/node_api_caller/fetch_price_feeds.js > /proc/1/fd/1 2> /proc/1/fd/2
+# requires newline at file end

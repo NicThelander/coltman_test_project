@@ -17,3 +17,4 @@ class PriceFeeds(BaseModel):
     timestamp: datetime
     target: str
     rates: dict
+    success: bool

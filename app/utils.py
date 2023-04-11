@@ -2,9 +2,11 @@ from jose import jwt
 from jose.exceptions import JOSEError
 from fastapi import HTTPException
 from datetime import datetime, timedelta
-from auth_vars import jwt_secret
+from os import environ
 import bcrypt
 from .database_utils import db1_users
+
+jwt_secret = environ["jwt_secret"]
 
 def register_user(reg_dict):
     # using bcrypt gensalt but could swap to kdf if the "pepper" style is preferred

@@ -1,5 +1,6 @@
-FROM node:19.8.1
+FROM alpine:3.17.3
 
+RUN apk add nodejs npm
 WORKDIR /code
 
 COPY ./node_api_caller ./node_api_caller
@@ -8,4 +9,11 @@ COPY package*.json ./
 
 RUN npm install
 
-CMD ["node", "./node_api_caller/fetch_price_feeds.js"]
+# just using this for testing
+# CMD ["node", "./node_api_caller/fetch_price_feeds.js"]
+
+COPY cron /etc/crontabs/root
+
+
+# runs the cron job in foreground with -f so it doesn't end container
+CMD ["crond", "-f", "-d", "8"]
